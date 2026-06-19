@@ -1,15 +1,19 @@
-import leituraDeMaquina
+from MT import parse_mt, verifica_palavra
+import leituraDeMaquina as lm
 
-descricao, testes = ler_maquina()
+descricao, casos_testes = lm.ler_maquina()
+MT = parse_mt(descricao)
+verifica_palavra(MT, casos_testes[1])
 
-if tipo == "AFD":
-    maquina = parse_afd(descricao)
+# tipo = input("Digite o tipo da máquina")
+# if tipo == "AFD":
+#     maquina = lm.parse_afd(descricao)
 
-elif tipo == "AFN":
-    maquina = parse_afn(descricao)
+# elif tipo == "AFN":
+#     maquina = lm.parse_afn(descricao)
 
-elif tipo == "APD":
-    maquina = parse_apd(descricao)
+# elif tipo == "APD":
+#     maquina = lm.parse_apd(descricao)
 
-elif tipo == "MT":
-    maquina = parse_mt(descricao)
+# elif tipo == "MT":
+#     maquina = lm.parse_mt(descricao)
