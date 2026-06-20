@@ -5,6 +5,8 @@
 # Após isso, basta chamar o "parser" da máquina desejada para configurar as transições de acordo com o tipo da máquina, dado que algumas possuem dados
 # para escrita na fita, ou então para empilhar e etc...
 
+import sys 
+
 def ler_maquina():
     linhas = [linha.rstrip('\n') for linha in sys.stdin]
 
@@ -25,6 +27,15 @@ def parse_cabecalho(descricao):
         "inicial": descricao[1].split()[1],
         "finais": descricao[2].split()[1:],
         "linhas_transicao": descricao[3:]
+    }
+
+def parse_cabecalho_turing(descricao):
+    return {
+        "estados": descricao[0].split()[1:],
+        "estados_escrita": descricao[1].split()[1:],
+        "inicial": descricao[2].split()[1],
+        "finais": descricao[3].split()[1:],
+        "linhas_transicao": descricao[4:]
     }
 
 def parse_afd(descricao):
@@ -91,32 +102,3 @@ def parse_apd(descricao):
 
     return maquina
 
-def parse_mt(descricao):
-    maquina = parse_cabecalho(descricao)
-
-    transicoes = {}
-
-    for linha in maquina["linhas_transicao"]:
-
-        esquerda, direita = linha.split(" -> ")
-
-        estado, simbolo_lido = esquerda.split()
-
-        prox_estado, simbolo_escrito, direcao = direita.split()
-
-        chave = (estado, simbolo_lido)
-
-        if chave not in transicoes:
-            transicoes[chave] = []
-
-        transicoes[chave].append(
-            (
-                prox_estado,
-                simbolo_escrito,
-                direcao
-            )
-        )
-
-    maquina["transicoes"] = transicoes
-
-    return maquina
