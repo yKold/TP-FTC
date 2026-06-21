@@ -4,10 +4,10 @@
 # estados iniciais, estodos finais e as linhas de transição.
 # Após isso, basta chamar o "parser" da máquina desejada para configurar as transições de acordo com o tipo da máquina, dado que algumas possuem dados
 # para escrita na fita, ou então para empilhar e etc...
+import sys
 
 def ler_maquina():
     linhas = [linha.rstrip('\n') for linha in sys.stdin]
-
     descricao = []
     i = 0
 
@@ -40,7 +40,6 @@ def parse_afd(descricao):
             transicoes[(origem, simbolo)] = destino
 
     maquina["transicoes"] = transicoes
-
     return maquina
 
 def parse_afn(descricao):
@@ -65,31 +64,6 @@ def parse_afn(descricao):
 
     return maquina
 
-def parse_apd(descricao):
-    maquina = parse_cabecalho(descricao)
-
-    transicoes = {}
-
-    for linha in maquina["linhas_transicao"]:
-
-        esquerda, direita = linha.split(" -> ")
-
-        estado, simbolo, topo = esquerda.split()
-
-        prox_estado, empilha = direita.split()
-
-        chave = (estado, simbolo, topo)
-
-        if chave not in transicoes:
-            transicoes[chave] = []
-
-        transicoes[chave].append(
-            (prox_estado, empilha)
-        )
-
-    maquina["transicoes"] = transicoes
-
-    return maquina
 
 def parse_mt(descricao):
     maquina = parse_cabecalho(descricao)
