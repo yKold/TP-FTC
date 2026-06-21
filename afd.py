@@ -1,7 +1,7 @@
 import leituraDeMaquina
 
 def configuracao_afd(descricao):
-    maquina = leituraDeMaquina.parse_cabecalho(descricao)
+    maquina = leituraDeMaquina.cabecalho_afd(descricao)
     transicoes = {}
     afn = False
 
@@ -63,7 +63,7 @@ def fecho_lambda(maquina, estados):
 
 def identifica_palavra_afd(maquina, palavra):
     estados_atuais = fecho_lambda(maquina, maquina["iniciais"])
-    
+
     for simbolo in palavra:
         novos_estados = set()
 
