@@ -3,8 +3,7 @@ import afd
 import leituraDeMaquina
 
 arquivo = input("Digite o nome do arquivo de entrada: ")
-arquivo_completo = "./TP-FTC/testes/" + arquivo
-descricao, testes = leituraDeMaquina.ler_maquina(arquivo_completo)
+descricao, testes = leituraDeMaquina.ler_maquina(arquivo)
 
 tipo = input("Digite maquina: ")
 
