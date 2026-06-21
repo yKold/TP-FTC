@@ -21,40 +21,40 @@ def ler_maquina(nome_arquivo):
 
     return descricao, casos_teste
 
-def parse_cabecalho(descricao):
+def cabecalho_afd(descricao):
     return {
         "estados": descricao[0].split()[1:],
-        "inicial": descricao[1].split()[1],
+        "inicial": descricao[1].split()[1:],
         "finais": descricao[2].split()[1:],
         "linhas_transicao": descricao[3:]
     }
 
+#Funcoes para APD
+def ler_maquina_APD_arquivo():
+    linhas = [linha.rstrip('\n') for linha in sys.stdin]
 
-def parse_afn(descricao):
-    maquina = parse_cabecalho(descricao)
+    descricao = []
+    k = 0
 
-    transicoes = {}
+    while linhas[k] != "---":
+        descricao.append(linhas[k])
+        k += 1
 
-    for linha in maquina["linhas_transicao"]:
-        origem, resto = linha.split(" -> ")
-        destino, simbolos = resto.split(" | ")
+    casos_teste = linhas[k+1:]
+    return descricao, casos_teste
 
-        for simbolo in simbolos.split():
-
-            chave = (origem, simbolo)
-
-            if chave not in transicoes:
-                transicoes[chave] = []
-
-            transicoes[chave].append(destino)
-
-    maquina["transicoes"] = transicoes
-
-    return maquina
+def cabecalho_apd(descricao):
+    return {
+        "estados": descricao[0].split()[1:],
+        "pilha": list(descricao[1])[1:],
+        "inicial": descricao[2].split()[1:],
+        "finais": descricao[3].split()[1:],
+        "linhas_transicao": descricao[4:]
+    }
 
 
 def parse_mt(descricao):
-    maquina = parse_cabecalho(descricao)
+    maquina = cabecalho_afd(descricao)
 
     transicoes = {}
 

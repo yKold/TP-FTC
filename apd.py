@@ -1,89 +1,111 @@
 import sys
-
-def ler_maquina_APD_terminal():
-    q = input("Q: ")
-    g = input("G: ")
-    i = input("I: ")
-    f = input("F: ")
-    linhas = [q, g, i, f]
-    linhas += [linha.rstrip('\n') for linha in sys.stdin]
-    descricao = []
-    k = 0
-
-    while linhas[k] != "---":
-        descricao.append(linhas[k])
-        k += 1
-    casos_teste = linhas[k+1:];
-    return descricao, casos_teste
+import leituraDeMaquina
+#def ler_maquina_APD_terminal():
+#   q = input("Q: ")
+#   g = input("G: ")
+#   i = input("I: ")
+#   f = input("F: ")
+#    linhas = [q, g, i, f]
+#    linhas += [linha.rstrip('\n') for linha in sys.stdin]
+#   descricao = []
+#    k = 0
+#   while linhas[k] != "---":
+#        descricao.append(linhas[k])
+#        k += 1
+#    casos_teste = linhas[k+1:];
+#    return descricao, casos_teste
 #usa ctrl+z para parar a leitura 🥶🤟
 
-def ler_maquina_APD_arquivo():
-    linhas = [linha.rstrip('\n') for linha in sys.stdin]
-
-    descricao = []
-    k = 0
-
-    while linhas[k] != "---":
-        descricao.append(linhas[k])
-        k += 1
-
-    casos_teste = linhas[k+1:]
-    return descricao, casos_teste
-
-def cabecalho_apd(descricao):
-    return {
-        "estados": descricao[0].split(),
-        "pilha": list(descricao[1]),
-        "inicial": descricao[2],
-        "finais": descricao[3].split(),
-        "linhas_transicao": descricao[4:]
-    }
-
-#funçao que pega e transforma em um dicionario onde tem (estado att, simbolo, topo pilha): (proximo estado, empilhar)
 def configuracao_apd(descricao):
-    maquina = cabecalho_apd(descricao)
+    maquina = leituraDeMaquina.cabecalho_apd(descricao)
+    if "\\" in maquina["pilha"]:
+        print("ERRO: o simbolo '\\' e reservado para lambda "
+            "e nao pode estar no alfabeto da pilha.")
+        sys.exit(1)
+
     transicoes = {}
+    apn = False
+
     for linha in maquina["linhas_transicao"]:
         origem, resto = linha.split(" -> ")
         destino, operacoes = resto.split(" | ")
+
         for op in operacoes.split():
             entrada, pilha = op.split(",")
             desempilha, empilha = pilha.split("/")
             chave = (origem, entrada, desempilha)
-            transicoes[chave] = (destino, empilha)
-        maquina["transicoes"] = transicoes
+
+            if chave not in transicoes:
+                transicoes[chave] = []
+
+            if len(transicoes[chave]) > 0:
+                apn = True
+                #print para verificar não determinismo
+                #print("\nAPN DETECTADO TRANSIÇÃO")
+
+            transicoes[chave].append((destino, empilha))
+            if entrada == "\\":
+                apn = True
+
+    maquina["transicoes"] = transicoes
+    if len(maquina["inicial"]) > 1:
+        apn = True
+        #print para verificar não determinismo
+        #print("\nAPN DETECTADO MÚLTIPLOS INICIAIS")
+
     return maquina
 
-#consome as entradas verificando se existem transiçoes e se n tiver da break e n reconhece, desempilha com pop e empilha com reversec
 def executar_apd(maquina, palavra):
-    estado = maquina["inicial"]
-    pilha = []
-    i = 0
-    while True:
+    configuracoes = []
+    for estado in maquina["inicial"]:
+        configuracoes.append((estado, [], 0))
+    visitados = set()
+
+    while configuracoes:
+        estado, pilha, i = configuracoes.pop()
+        assinatura = (estado, tuple(pilha), i)
+
+        if assinatura in visitados:
+            continue
+
+        visitados.add(assinatura)
+
+        # condição de aceitação
+        if i == len(palavra) and len(pilha) == 0:
+            return "OK"
+
         simbolo_entrada = palavra[i] if i < len(palavra) else "\\"
         topo = pilha[-1] if pilha else "\\"
-        transicao = None
-        consumiu = False
+        transicoes_possiveis = []
+
+        # consome símbolo
         chave = (estado, simbolo_entrada, topo)
-        if (simbolo_entrada != "\\" and chave in maquina["transicoes"]):
-            transicao = maquina["transicoes"][chave]
-            consumiu = True
-        else:
-            chave = (estado, "\\", topo)
-            if chave in maquina["transicoes"]:
-                transicao = maquina["transicoes"][chave]
-        if transicao is None:
-            break
-        if consumiu:
-            i += 1
-        prox_estado, empilha = transicao
-        if topo != "\\":
-            pilha.pop()
-        if empilha != "\\":
-            for simbolo in reversed(empilha):
-                pilha.append(simbolo)
-        estado = prox_estado
-    if(i == len(palavra) and len(pilha) == 0):
-        return "OK"
-    else:
-        return "X"
+
+        if simbolo_entrada != "\\" and chave in maquina["transicoes"]:
+            for destino, empilha in maquina["transicoes"][chave]:
+                transicoes_possiveis.append((destino, empilha, True))
+
+        # lambda
+        chave = (estado, "\\", topo)
+
+        if chave in maquina["transicoes"]:
+            for destino, empilha in maquina["transicoes"][chave]:
+                transicoes_possiveis.append((destino, empilha, False))
+
+        # expande todos os caminhos
+        for prox_estado, empilha, consumiu in transicoes_possiveis:
+            nova_pilha = pilha.copy()
+
+            if topo != "\\":
+                nova_pilha.pop()
+
+            if empilha != "\\":
+                for simbolo in reversed(empilha):
+                    nova_pilha.append(simbolo)
+
+            novo_i = i
+            if consumiu:
+                novo_i += 1
+
+            configuracoes.append((prox_estado,nova_pilha,novo_i))
+    return "X"

@@ -2,16 +2,17 @@ import apd
 import afd
 import leituraDeMaquina
 
-descricao, testes = leituraDeMaquina.ler_maquina("entrada.txt")
+arquivo = input("Digite o nome do arquivo de entrada: ")
+arquivo_completo = "./TP-FTC/testes/" + arquivo
+descricao, testes = leituraDeMaquina.ler_maquina(arquivo_completo)
 
 tipo = input("Digite maquina: ")
 
 if tipo == "AFD":
     maquina = afd.configuracao_afd(descricao)
     resultados = afd.faz_testes(maquina, testes)
-
-elif tipo == "AFN":
-    maquina = leituraDeMaquina.parse_afn(descricao)
+    for i in range(len(resultados)):
+        print(resultados[i])
 
 elif tipo == "APD":
     maquina = apd.configuracao_apd(descricao)
