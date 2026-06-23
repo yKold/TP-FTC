@@ -17,11 +17,16 @@ import leituraDeMaquina
 #usa ctrl+z para parar a leitura 🥶🤟
 
 def configuracao_apd(descricao):
+    try:
     maquina = leituraDeMaquina.cabecalho_apd(descricao)
     if "\\" in maquina["pilha"]:
         print("ERRO: o simbolo '\\' e reservado para lambda "
             "e nao pode estar no alfabeto da pilha.")
         sys.exit(1)
+
+
+    if "pilha" not in maquina:
+        raise KeyError("Campo 'pilha' não encontrado na descrição.")
 
     transicoes = {}
     apn = False
@@ -29,8 +34,20 @@ def configuracao_apd(descricao):
     for linha in maquina["linhas_transicao"]:
         origem, resto = linha.split(" -> ")
         destino, operacoes = resto.split(" | ")
+        
+        for numero_linha, linha in enumerate(linhas_transicao, start=1):
 
+        try:
+            origem, resto = linha.split(" -> ")
+            destino, operacoes = resto.split(" | ")
+
+        except ValueError:
+            raise ValueError(
+                f"Erro de sintaxe na transição da linha "
+                f"{numero_linha}: '{linha}'"
+            )
         for op in operacoes.split():
+            try:
             entrada, pilha = op.split(",")
             desempilha, empilha = pilha.split("/")
             chave = (origem, entrada, desempilha)
@@ -62,7 +79,12 @@ def executar_apd(maquina, palavra):
     visitados = set()
 
     while configuracoes:
+          try:
         estado, pilha, i = configuracoes.pop()
+except ValueError:
+            raise RuntimeError(
+                "Configuração interna corrompida."
+            )
         assinatura = (estado, tuple(pilha), i)
 
         if assinatura in visitados:
@@ -80,28 +102,39 @@ def executar_apd(maquina, palavra):
 
         # consome símbolo
         chave = (estado, simbolo_entrada, topo)
-
+try:
         if simbolo_entrada != "\\" and chave in maquina["transicoes"]:
             for destino, empilha in maquina["transicoes"][chave]:
                 transicoes_possiveis.append((destino, empilha, True))
-
+except Exception as erro:
+            raise RuntimeError(
+                f"Erro ao processar transições: {erro}"
+            ) from erro
         # lambda
         chave = (estado, "\\", topo)
 
         if chave in maquina["transicoes"]:
             for destino, empilha in maquina["transicoes"][chave]:
                 transicoes_possiveis.append((destino, empilha, False))
+                except Exception as erro:
+            raise RuntimeError(
+                f"Erro ao processar transições: {erro}"
+            ) from erro
 
         # expande todos os caminhos
         for prox_estado, empilha, consumiu in transicoes_possiveis:
             nova_pilha = pilha.copy()
-
+            try:
             if topo != "\\":
                 nova_pilha.pop()
 
             if empilha != "\\":
                 for simbolo in reversed(empilha):
                     nova_pilha.append(simbolo)
+                    except Exception as erro:
+                raise RuntimeError(
+                    f"Erro ao manipular pilha: {erro}"
+                ) from erro
 
             novo_i = i
             if consumiu:
