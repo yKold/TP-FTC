@@ -40,6 +40,15 @@ def configuracao_afd(descricao):
             afn = True
             #prints utilizados para debug de reconhecimento de não determinismo
             #print("\nAFN DETECTADO TRANSICAO COM LAMBDA")
+    
+    for (estado, simbolo), destinos in transicoes.items():
+    if simbolo == "\\" and len(destinos) > 0:
+        afn = True
+
+# Alfabeto da linguagem
+maquina["alfabeto"] = {"p", "q", "d"}
+
+return maquina
 
     return maquina
 
@@ -62,6 +71,13 @@ def fecho_lambda(maquina, estados):
 
 
 def identifica_palavra_afd(maquina, palavra):
+    def identifica_palavra_afd(maquina, palavra):
+
+    for simbolo in palavra:
+        if simbolo not in maquina["alfabeto"]:
+            return "X"
+
+    estados_atuais = fecho_lambda(maquina, maquina["iniciais"])
     estados_atuais = fecho_lambda(maquina, maquina["iniciais"])
 
     for simbolo in palavra:
