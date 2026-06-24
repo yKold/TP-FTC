@@ -16,7 +16,7 @@ import leituraDeMaquina
 #    return descricao, casos_teste
 #usa ctrl+z para parar a leitura 🥶🤟
 
-def configuracao_apd(descricao):
+def configuracao_ap(descricao, alfabeto):
     maquina = leituraDeMaquina.cabecalho_apd(descricao)
     if "\\" in maquina["pilha"]:
         print("ERRO: o simbolo '\\' e reservado para lambda "
@@ -35,13 +35,17 @@ def configuracao_apd(descricao):
             desempilha, empilha = pilha.split("/")
             chave = (origem, entrada, desempilha)
 
+            if entrada not in alfabeto:
+                print("Simbolo invalido")
+                return {}
+
             if chave not in transicoes:
                 transicoes[chave] = []
 
             if len(transicoes[chave]) > 0:
                 apn = True
                 #print para verificar não determinismo
-                #print("\nAPN DETECTADO TRANSIÇÃO")
+                # print("\nAPN DETECTADO TRANSIÇÃO")
 
             transicoes[chave].append((destino, empilha))
             if entrada == "\\":
@@ -51,11 +55,11 @@ def configuracao_apd(descricao):
     if len(maquina["inicial"]) > 1:
         apn = True
         #print para verificar não determinismo
-        #print("\nAPN DETECTADO MÚLTIPLOS INICIAIS")
+        # print("\nAPN DETECTADO MÚLTIPLOS INICIAIS")
 
     return maquina
 
-def executar_apd(maquina, palavra):
+def executar_ap(maquina, palavra):
     configuracoes = []
     for estado in maquina["inicial"]:
         configuracoes.append((estado, [], 0))
@@ -72,7 +76,8 @@ def executar_apd(maquina, palavra):
 
         # condição de aceitação
         if i == len(palavra) and len(pilha) == 0:
-            return "OK"
+            print("OK")
+            return
 
         simbolo_entrada = palavra[i] if i < len(palavra) else "\\"
         topo = pilha[-1] if pilha else "\\"
@@ -108,4 +113,4 @@ def executar_apd(maquina, palavra):
                 novo_i += 1
 
             configuracoes.append((prox_estado,nova_pilha,novo_i))
-    return "X"
+    print("X")

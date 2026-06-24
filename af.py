@@ -1,6 +1,6 @@
 import leituraDeMaquina
 
-def configuracao_afd(descricao):
+def configuracao_af(descricao, alfabeto):
     maquina = leituraDeMaquina.cabecalho_afd(descricao)
     transicoes = {}
     afn = False
@@ -11,13 +11,16 @@ def configuracao_afd(descricao):
 
         for simbolo in simbolos.split():
             chave = (origem, simbolo)
+            if simbolo not in alfabeto:
+                print("Simbolo invalido")
+                return {}
             if chave not in transicoes:
                 transicoes[chave] = set()
 
             if len(transicoes[chave]) > 0 and destino not in transicoes[chave]:
                 afn = True
                 #prints utilizados para debug de reconhecimento de não determinismo
-                #print("\nAFN DETECTADO NA TRANSIÇÃO")
+                # print("\nAFN DETECTADO NA TRANSIÇÃO")
 
             transicoes[chave].add(destino)
 
@@ -39,7 +42,7 @@ def configuracao_afd(descricao):
         if simbolo == "\\" and len(destinos) > 0:
             afn = True
             #prints utilizados para debug de reconhecimento de não determinismo
-            #print("\nAFN DETECTADO TRANSICAO COM LAMBDA")
+            # print("\nAFN DETECTADO TRANSICAO COM LAMBDA")
 
     return maquina
 
@@ -61,7 +64,7 @@ def fecho_lambda(maquina, estados):
     return resultado
 
 
-def identifica_palavra_afd(maquina, palavra):
+def identifica_palavra_af(maquina, palavra):
     estados_atuais = fecho_lambda(maquina, maquina["iniciais"])
 
     for simbolo in palavra:
@@ -79,15 +82,16 @@ def identifica_palavra_afd(maquina, palavra):
         estados_atuais = fecho_lambda(maquina, novos_estados)
 
     if estados_atuais.intersection(maquina["finais"]):
-        return "OK"
+        print("OK")
+        return 
+    
+    print("X")
 
-    return "X"
+# def faz_testes(maquina, testes):
+#     resultados = []
 
-def faz_testes(maquina, testes):
-    resultados = []
+#     for palavra in testes:
+#         resultado = identifica_palavra_af(maquina, palavra)
+#         resultados.append(resultado)
 
-    for palavra in testes:
-        resultado = identifica_palavra_afd(maquina, palavra)
-        resultados.append(resultado)
-
-    return resultados
+#     return resultados

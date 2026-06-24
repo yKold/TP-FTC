@@ -1,4 +1,6 @@
+@AF
 Q: a b c d e
+S: 01
 I: a b
 F: d
 a -> b | 1

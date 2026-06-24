@@ -1,4 +1,6 @@
+@MT
 Q: A B X
+S: 01
 G: a b
 I: A
 F: X

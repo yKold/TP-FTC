@@ -4,20 +4,29 @@
 # estados iniciais, estodos finais e as linhas de transição.
 # Após isso, basta chamar o "parser" da máquina desejada para configurar as transições de acordo com o tipo da máquina, dado que algumas possuem dados
 # para escrita na fita, ou então para empilhar e etc...
-import sys
+# import sys
 
 def ler_maquina(nome_arquivo):
     with open(nome_arquivo, "r") as arquivo:
         linhas = [linha.rstrip('\n') for linha in arquivo]
+
     descricao = []
-    i = 0
+    tipo = ""
+    alfabeto = ""
 
-    while linhas[i] != "---":
-        descricao.append(linhas[i])
-        i += 1
+    for i in range(len(linhas)):
+        if i == 0:
+            tipo = linhas[0].lstrip('@')
+            i = 1
+        elif "S" in linhas[i]:
+            alfabeto = linhas[i].lstrip("S: ")
+        elif linhas[i] != "---":
+            descricao.append(linhas[i])
+        else:
+            casos_teste = linhas[i+1:]
+            break
 
-    casos_teste = linhas[i+1:]
-    return descricao, casos_teste
+    return tipo, alfabeto, descricao, casos_teste
 
 def cabecalho_afd(descricao):
     return {

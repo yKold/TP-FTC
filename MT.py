@@ -1,6 +1,6 @@
 from leituraDeMaquina import parse_cabecalho_turing
 
-def parse_mt(descricao):
+def parse_mt(descricao, alfabeto):
     maquina = parse_cabecalho_turing(descricao)
     transicoes = {}
 
@@ -14,6 +14,10 @@ def parse_mt(descricao):
             leitura = transicao[0]
             escrita = transicao[2]
             direcao = transicao[3]
+            
+            if leitura not in alfabeto:
+                print("Simbolo invalido")
+                return {}
 
             chave = (estado_atual, leitura)
 
@@ -75,6 +79,6 @@ def verifica_palavra(maquina, palavra):
     resultado_fita = ''.join(fita).rstrip('_')
 
     if estado_atual in maquina["finais"]:
-        print("OK", resultado_fita)
+        print(f"OK <{resultado_fita}")
     else:
-        print("X", resultado_fita)
+        print(f"X <{resultado_fita}")

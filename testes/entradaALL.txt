@@ -1,4 +1,6 @@
+@ALL
 Q: x fim
+S: 01
 G:
 I: x
 F: fim

@@ -1,34 +1,36 @@
-import ap
-import af
+import AP
+import AF
 import leituraDeMaquina
 from MT import parse_mt, verifica_palavra as VPMT
 from ALL import verifica_palavra_all as VPALL
 
 arquivo = input("Digite o nome do arquivo de entrada: ")
-descricao, testes = leituraDeMaquina.ler_maquina(arquivo)
+tipo, alfabeto, descricao, testes = leituraDeMaquina.ler_maquina(arquivo)
 
-tipo = input("Digite maquina: ")
+if tipo == "AF":
+    alfabeto += "\\"
+    maquina = AF.configuracao_af(descricao, alfabeto)
+    if maquina != {}:
+        for caso in testes:
+            AF.identifica_palavra_af(maquina, caso)
 
-if tipo == "AFD":
-    maquina = af.configuracao_afd(descricao)
-    resultados = af.faz_testes(maquina, testes)
-    for i in range(len(resultados)):
-        print(resultados[i])
-
-elif tipo == "APD":
-    maquina = ap.configuracao_apd(descricao)
-    for palavra in testes:
-        resultado = ap.executar_apd(maquina, palavra)
-        print(resultado)
+elif tipo == "AP":
+    alfabeto += "\\"
+    maquina = AP.configuracao_ap(descricao, alfabeto)
+    if maquina != {}:
+        for caso in testes:
+            AP.executar_ap(maquina, caso)
 
 elif tipo == "MT":
-    descricao, casos_testes = leituraDeMaquina.ler_maquina(arquivo)
-    MT = parse_mt(descricao)
-    for caso in casos_testes:
-        VPMT(MT, caso)
+    alfabeto += "_<"
+    maquina = parse_mt(descricao, alfabeto)
+    if maquina != {}:
+        for caso in testes:
+            VPMT(maquina, caso)
 
 elif tipo == "ALL":
-    descricao, casos_testes = leituraDeMaquina.ler_maquina(arquivo)
-    ALL = parse_mt(descricao)
-    for caso in casos_testes:
-        VPALL(ALL, caso)
+    alfabeto += "_<>"
+    maquina = parse_mt(descricao, alfabeto)
+    if maquina != {}:
+        for caso in testes:
+            VPALL(maquina, caso)
