@@ -1,6 +1,8 @@
 import apd
 import afd
 import leituraDeMaquina
+from MT import parse_mt, verifica_palavra as VPMT
+from ALL import verifica_palavra_all as VPALL
 
 arquivo = input("Digite o nome do arquivo de entrada: ")
 descricao, testes = leituraDeMaquina.ler_maquina(arquivo)
@@ -20,4 +22,15 @@ elif tipo == "APD":
         print(resultado)
 
 elif tipo == "MT":
-    maquina = leituraDeMaquina.parse_mt(descricao)
+    descricao, casos_testes = leituraDeMaquina.ler_maquina(arquivo)
+    MT = parse_mt(descricao)
+    for caso in casos_testes:
+        VPMT(MT, caso)
+    print("")
+
+elif tipo == "ALL":
+    descricao, casos_testes = leituraDeMaquina.ler_maquina(arquivo)
+    print(descricao)
+    ALL = parse_mt(descricao)
+    for caso in casos_testes:
+        VPALL(ALL, caso)

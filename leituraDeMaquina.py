@@ -9,7 +9,6 @@ import sys
 def ler_maquina(nome_arquivo):
     with open(nome_arquivo, "r") as arquivo:
         linhas = [linha.rstrip('\n') for linha in arquivo]
-
     descricao = []
     i = 0
 
@@ -29,19 +28,14 @@ def cabecalho_afd(descricao):
         "linhas_transicao": descricao[3:]
     }
 
-#Funcoes para APD
-def ler_maquina_APD_arquivo():
-    linhas = [linha.rstrip('\n') for linha in sys.stdin]
-
-    descricao = []
-    k = 0
-
-    while linhas[k] != "---":
-        descricao.append(linhas[k])
-        k += 1
-
-    casos_teste = linhas[k+1:]
-    return descricao, casos_teste
+def parse_cabecalho_turing(descricao):
+    return {
+        "estados": descricao[0].split()[1:],
+        "estados_escrita": descricao[1].split()[1:],
+        "inicial": descricao[2].split()[1],
+        "finais": descricao[3].split()[1:],
+        "linhas_transicao": descricao[4:]
+    }
 
 def cabecalho_apd(descricao):
     return {
@@ -52,33 +46,3 @@ def cabecalho_apd(descricao):
         "linhas_transicao": descricao[4:]
     }
 
-
-def parse_mt(descricao):
-    maquina = cabecalho_afd(descricao)
-
-    transicoes = {}
-
-    for linha in maquina["linhas_transicao"]:
-
-        esquerda, direita = linha.split(" -> ")
-
-        estado, simbolo_lido = esquerda.split()
-
-        prox_estado, simbolo_escrito, direcao = direita.split()
-
-        chave = (estado, simbolo_lido)
-
-        if chave not in transicoes:
-            transicoes[chave] = []
-
-        transicoes[chave].append(
-            (
-                prox_estado,
-                simbolo_escrito,
-                direcao
-            )
-        )
-
-    maquina["transicoes"] = transicoes
-
-    return maquina
