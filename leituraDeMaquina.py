@@ -5,10 +5,13 @@
 # Após isso, basta chamar o "parser" da máquina desejada para configurar as transições de acordo com o tipo da máquina, dado que algumas possuem dados
 # para escrita na fita, ou então para empilhar e etc...
 
-import sys 
+# import sys 
 
-def ler_maquina():
-    linhas = [linha.rstrip('\n') for linha in sys.stdin]
+def ler_maquina(arquivo_lido):
+    # linhas = [linha.rstrip('\n') for linha in sys.stdin]
+
+    with open(arquivo_lido+".txt", "r", encoding="utf-8") as arquivo:
+        linhas = [linha.rstrip('\n') for linha in arquivo]
 
     descricao = []
     i = 0
