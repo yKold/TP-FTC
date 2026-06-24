@@ -4,11 +4,11 @@
 # estados iniciais, estodos finais e as linhas de transição.
 # Após isso, basta chamar o "parser" da máquina desejada para configurar as transições de acordo com o tipo da máquina, dado que algumas possuem dados
 # para escrita na fita, ou então para empilhar e etc...
-import sys
 
-def ler_maquina(nome_arquivo):
-    with open(nome_arquivo, "r") as arquivo:
-        linhas = [linha.rstrip('\n') for linha in arquivo]
+import sys 
+
+def ler_maquina():
+    linhas = [linha.rstrip('\n') for linha in sys.stdin]
 
     descricao = []
     i = 0
@@ -21,40 +21,63 @@ def ler_maquina(nome_arquivo):
 
     return descricao, casos_teste
 
-def cabecalho_afd(descricao):
+def parse_cabecalho(descricao):
     return {
         "estados": descricao[0].split()[1:],
-        "inicial": descricao[1].split()[1:],
+        "inicial": descricao[1].split()[1],
         "finais": descricao[2].split()[1:],
         "linhas_transicao": descricao[3:]
     }
 
-#Funcoes para APD
-def ler_maquina_APD_arquivo():
-    linhas = [linha.rstrip('\n') for linha in sys.stdin]
-
-    descricao = []
-    k = 0
-
-    while linhas[k] != "---":
-        descricao.append(linhas[k])
-        k += 1
-
-    casos_teste = linhas[k+1:]
-    return descricao, casos_teste
-
-def cabecalho_apd(descricao):
+def parse_cabecalho_turing(descricao):
     return {
         "estados": descricao[0].split()[1:],
-        "pilha": list(descricao[1])[1:],
-        "inicial": descricao[2].split()[1:],
+        "estados_escrita": descricao[1].split()[1:],
+        "inicial": descricao[2].split()[1],
         "finais": descricao[3].split()[1:],
         "linhas_transicao": descricao[4:]
     }
 
+def parse_afd(descricao):
+    maquina = parse_cabecalho(descricao)
 
-def parse_mt(descricao):
-    maquina = cabecalho_afd(descricao)
+    transicoes = {}
+
+    for linha in maquina["linhas_transicao"]:
+        origem, resto = linha.split(" -> ")
+        destino, simbolos = resto.split(" | ")
+
+        for simbolo in simbolos.split():
+            transicoes[(origem, simbolo)] = destino
+
+    maquina["transicoes"] = transicoes
+
+    return maquina
+
+def parse_afn(descricao):
+    maquina = parse_cabecalho(descricao)
+
+    transicoes = {}
+
+    for linha in maquina["linhas_transicao"]:
+        origem, resto = linha.split(" -> ")
+        destino, simbolos = resto.split(" | ")
+
+        for simbolo in simbolos.split():
+
+            chave = (origem, simbolo)
+
+            if chave not in transicoes:
+                transicoes[chave] = []
+
+            transicoes[chave].append(destino)
+
+    maquina["transicoes"] = transicoes
+
+    return maquina
+
+def parse_apd(descricao):
+    maquina = parse_cabecalho(descricao)
 
     transicoes = {}
 
@@ -62,23 +85,20 @@ def parse_mt(descricao):
 
         esquerda, direita = linha.split(" -> ")
 
-        estado, simbolo_lido = esquerda.split()
+        estado, simbolo, topo = esquerda.split()
 
-        prox_estado, simbolo_escrito, direcao = direita.split()
+        prox_estado, empilha = direita.split()
 
-        chave = (estado, simbolo_lido)
+        chave = (estado, simbolo, topo)
 
         if chave not in transicoes:
             transicoes[chave] = []
 
         transicoes[chave].append(
-            (
-                prox_estado,
-                simbolo_escrito,
-                direcao
-            )
+            (prox_estado, empilha)
         )
 
     maquina["transicoes"] = transicoes
 
     return maquina
+
