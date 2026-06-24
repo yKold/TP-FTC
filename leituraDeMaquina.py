@@ -17,7 +17,6 @@ def ler_maquina(nome_arquivo):
         i += 1
 
     casos_teste = linhas[i+1:]
-
     return descricao, casos_teste
 
 def cabecalho_afd(descricao):
