@@ -17,7 +17,6 @@ import leituraDeMaquina
 #usa ctrl+z para parar a leitura 🥶🤟
 
 def configuracao_apd(descricao):
-    try:
     maquina = leituraDeMaquina.cabecalho_apd(descricao)
     if "\\" in maquina["pilha"]:
         print("ERRO: o simbolo '\\' e reservado para lambda "
@@ -30,6 +29,7 @@ def configuracao_apd(descricao):
 
     transicoes = {}
     apn = False
+    alfabeto = set()
 
     for linha in maquina["linhas_transicao"]:
         origem, resto = linha.split(" -> ")
@@ -37,18 +37,14 @@ def configuracao_apd(descricao):
         
         for numero_linha, linha in enumerate(linhas_transicao, start=1):
 
-        try:
             origem, resto = linha.split(" -> ")
             destino, operacoes = resto.split(" | ")
 
-        except ValueError:
-            raise ValueError(
-                f"Erro de sintaxe na transição da linha "
-                f"{numero_linha}: '{linha}'"
-            )
         for op in operacoes.split():
-            try:
+        
             entrada, pilha = op.split(",")
+            if entrada != "\\":
+    alfabeto.add(entrada)
             desempilha, empilha = pilha.split("/")
             chave = (origem, entrada, desempilha)
 
@@ -65,6 +61,7 @@ def configuracao_apd(descricao):
                 apn = True
 
     maquina["transicoes"] = transicoes
+maquina["alfabeto"] = {"a", "b", "c"}
     if len(maquina["inicial"]) > 1:
         apn = True
         #print para verificar não determinismo
@@ -73,10 +70,13 @@ def configuracao_apd(descricao):
     return maquina
 
 def executar_apd(maquina, palavra):
+    for simbolo in palavra:
+    if simbolo not in maquina["alfabeto"]:
+        return "X"
     configuracoes = []
-    for estado in maquina["inicial"]:
+for estado in maquina["inicial"]:
         configuracoes.append((estado, [], 0))
-    visitados = set()
+
 
     while configuracoes:
           try:
